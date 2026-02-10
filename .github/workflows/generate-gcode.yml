@@ -33,16 +33,8 @@ jobs:
       - name: Generate G-code files
         run: |
           for svg in $(find . -name "*.svg" -not -path "./.git/*"); do
-            basename=$(basename "$svg" .svg)
-            output="${basename}_combined.gcode"
-            echo "Processing $svg -> $output"
-            python -m laser.combine_cut_engrave "$svg" \
-              --engrave-cutting-speed 1000 \
-              --engrave-power 75 \
-              --cut-cutting-speed 250 \
-              --cut-power 255 \
-              --travel-speed 3000 \
-              -o "$output" || echo "Warning: Failed to process $svg"
+            echo "Processing $svg"
+            laser-gcode "$svg" || echo "Warning: Failed to process $svg"
           done
       
       - name: Upload G-code artifacts
