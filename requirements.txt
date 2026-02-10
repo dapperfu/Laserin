@@ -1,0 +1,2 @@
+# Python 3.10+ required
+git+https://github.com/dapperfu/laser-tool.git
