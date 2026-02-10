@@ -1,0 +1,54 @@
+name: Generate G-code from SVG
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  generate-gcode:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install laser-tool
+        run: |
+          pip install git+https://github.com/dapperfu/laser-tool.git
+      
+      - name: Find SVG files
+        id: find-svg
+        run: |
+          svg_files=$(find . -name "*.svg" -not -path "./.git/*" | tr '\n' ' ')
+          echo "files=$svg_files" >> $GITHUB_OUTPUT
+          echo "Found SVG files:"
+          echo "$svg_files"
+      
+      - name: Generate G-code files
+        run: |
+          for svg in $(find . -name "*.svg" -not -path "./.git/*"); do
+            basename=$(basename "$svg" .svg)
+            output="${basename}_combined.gcode"
+            echo "Processing $svg -> $output"
+            python -m laser.combine_cut_engrave "$svg" \
+              --engrave-cutting-speed 1000 \
+              --engrave-power 75 \
+              --cut-cutting-speed 250 \
+              --cut-power 255 \
+              --travel-speed 3000 \
+              -o "$output" || echo "Warning: Failed to process $svg"
+          done
+      
+      - name: Upload G-code artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gcode-files
+          path: "*.gcode"
+          retention-days: 30
+          if-no-files-found: warn
