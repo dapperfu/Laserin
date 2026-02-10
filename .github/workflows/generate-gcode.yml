@@ -25,7 +25,7 @@ jobs:
       
       - name: Install laser-tool
         run: |
-          pip install git+https://github.com/dapperfu/laser-tool.git
+          pip install --no-cache-dir --force-reinstall git+https://github.com/dapperfu/laser-tool.git
       
       - name: Find SVG files
         id: find-svg
