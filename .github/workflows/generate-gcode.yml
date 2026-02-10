@@ -39,7 +39,7 @@ jobs:
         run: |
           for svg in $(find . -name "*.svg" -not -path "./.git/*"); do
             echo "Processing $svg"
-            laser-gcode "$svg" || echo "Warning: Failed to process $svg"
+            laser-gcode main "$svg" || echo "Warning: Failed to process $svg"
           done
       
       - name: Upload G-code artifacts
